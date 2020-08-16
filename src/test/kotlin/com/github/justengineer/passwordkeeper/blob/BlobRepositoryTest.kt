@@ -1,16 +1,18 @@
 package com.github.justengineer.passwordkeeper.blob
 
+import com.github.justengineer.passwordkeeper.MongoAuditConfig
 import kotlinx.coroutines.runBlocking
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest
+import org.springframework.context.annotation.Import
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.MongoDBContainer
-import org.testcontainers.junit.jupiter.Container
-import org.testcontainers.junit.jupiter.Testcontainers
 
 @DataMongoTest
+@Import(MongoAuditConfig::class)
 class BlobRepositoryTest {
 
     @Autowired
@@ -32,11 +34,13 @@ class BlobRepositoryTest {
     }
 
     @Test
-    fun name() {
+    fun auditingSave() {
         runBlocking {
-            val entity = repository.save(BlobEntity("testhexblob"))
-            println("entity = $entity")
+            val payload = "testhexblob"
+            val entity = repository.save(BlobEntity(cypheredBlob = payload))
+            assertThat(entity.id).isNotNull()
+            assertThat(entity.createdDate).isNotNull()
+            assertThat(entity.cypheredBlob).isEqualTo(payload)
         }
-
     }
 }
