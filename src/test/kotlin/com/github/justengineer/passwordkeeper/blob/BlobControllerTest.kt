@@ -1,8 +1,8 @@
 package com.github.justengineer.passwordkeeper.blob
 
+import com.github.justengineer.passwordkeeper.blob.dto.BlobDto
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.coEvery
-import io.mockk.every
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,17 +24,17 @@ internal class BlobControllerTest {
     internal fun saveBlob() {
         coEvery { service.saveBlob(any()) } answers { firstArg() }
 
-        val payload = BlobEntity(cypheredBlob = "blobdata")
+        val payload = BlobEntity(cypheredPayload = "blobdata")
         client.post()
                 .uri("/blob")
                 .bodyValue(payload)
                 .exchange()
                 .expectStatus().isOk
-                .expectBody<BlobEntity>()
+                .expectBody<BlobDto>()
                 .consumeWith {
                     assertThat(it.responseBody)
                             .isNotNull
-                            .isEqualTo(payload)
+                            .isEqualToComparingFieldByField(payload)
                 }
 
 
