@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
+import java.util.*
 
 @WebFluxTest(controllers = [BlobController::class])
 //@TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -24,7 +25,7 @@ internal class BlobControllerTest {
     internal fun saveBlob() {
         coEvery { service.saveBlob(any()) } answers { firstArg() }
 
-        val payload = BlobEntity(cypheredPayload = "blobdata")
+        val payload = BlobEntity("blobdata")
         client.post()
                 .uri("/blob")
                 .bodyValue(payload)

@@ -15,13 +15,7 @@ class BlobService(private val repository: BlobRepository) {
     }
 
     suspend fun getLatestRecords(userId: String): List<BlobEntity> {
-        val recordsByUserId = repository.findByUserId(userId)
-
-        StreamEx.of(recordsByUserId)
-
-                .groupingBy { it.recordId }
-
-
-
+        val recordsByUserId = repository.findLatestRecordsByUserId(userId)
+        return emptyList()
     }
 }

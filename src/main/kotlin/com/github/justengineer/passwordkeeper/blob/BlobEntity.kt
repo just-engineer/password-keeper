@@ -21,4 +21,8 @@ data class BlobEntity(@Id val id: String? = null,
                       val recordVersion: Long = 0L) {
     constructor(userId: String, cypheredPayload: String) :
             this(null, null, UUID.randomUUID().toString(), cypheredPayload, userId, 0L)
+
+    constructor(cypheredPayload: String) :
+            this(null, null, UUID.randomUUID().toString(), cypheredPayload, UUID.randomUUID().toString(), 0L)
+
 }
