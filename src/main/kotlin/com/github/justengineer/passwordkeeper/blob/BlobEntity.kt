@@ -13,12 +13,12 @@ import java.util.*
 
 @Document
 @CompoundIndex(def = "{ 'recordId':1, 'recordVersion':1 }", unique = true)
-data class BlobEntity(@Id val id: String? = null,
-                      @CreatedDate val createdDate: Instant? = null,
+data class BlobEntity(@Id val id: String?,
+                      @CreatedDate val createdDate: Instant?,
                       @Indexed val recordId: String,
                       val cypheredPayload: String,
                       @Indexed val userId: String,
-                      val recordVersion: Long = 0L) {
+                      val recordVersion: Long) {
     constructor(userId: String, cypheredPayload: String) :
             this(null, null, UUID.randomUUID().toString(), cypheredPayload, userId, 0L)
 

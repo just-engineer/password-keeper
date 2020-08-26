@@ -1,7 +1,6 @@
 package com.github.justengineer.passwordkeeper.blob
 
 import com.github.justengineer.passwordkeeper.MongoConfig
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import one.util.streamex.LongStreamEx
@@ -14,6 +13,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
+import org.springframework.transaction.annotation.Transactional
 import org.testcontainers.containers.MongoDBContainer
 import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -54,13 +54,27 @@ class BlobRepositoryTest(@Autowired val repository: BlobRepository) {
         val saved = repository.save(entity)
 
         val duplicate = BlobEntity(
+                id = null,
                 cypheredPayload = payload,
                 recordId = saved.recordId,
                 recordVersion = saved.recordVersion,
-                userId = UUID.randomUUID().toString())
+                userId = UUID.randomUUID().toString(),
+                createdDate = null
+        )
 
         assertThatThrownBy { runBlocking { repository.save(duplicate) } }
                 .isInstanceOf(DuplicateKeyException::class.java)
+    }
+
+    @Test
+    fun findById() = runBlocking {
+        val entity = BlobEntity("payload")
+        val saved = repository.save(entity)
+        println("entity = $entity")
+        println("saved = $saved")
+        val found = repository.findById(saved.id!!)
+        println("found = $found")
+
     }
 
     @Test
@@ -72,23 +86,26 @@ class BlobRepositoryTest(@Autowired val repository: BlobRepository) {
                 .flatMap {
                     streamRecordVersions(it, userId)
                 }.toList()
-        val records = runBlocking {
+        runBlocking {
             val savedBlobs = repository.saveAll(blobs).toList()
             println("savedBlobs = $savedBlobs")
-            repository.findLatestRecordsByUserId(userId).toList()
+            val allSaved = repository.findAll().toList()
+            println("allSaved = $allSaved")
+            val found = repository.findLatestRecordsByUserId(userId).toList()
+            assertThat(found).hasSize(size)
+            println("records = $found")
         }
-        assertThat(records).hasSize(size)
-        println("records = $records")
     }
 
     private fun streamRecordVersions(recordId: String, userId: String): StreamEx<BlobEntity>? {
         return LongStreamEx.range(5)
                 .mapToObj {
-                    BlobEntity(
+                    BlobEntity(id = null,
                             cypheredPayload = "cypheredPayload",
                             recordId = recordId,
                             recordVersion = it,
-                            userId = userId)
+                            userId = userId,
+                            createdDate = null)
                 }
     }
 }

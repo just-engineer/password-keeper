@@ -7,13 +7,4 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing
 
 @EnableMongoAuditing
 @Configuration(proxyBeanMethods = false)
-class MongoConfig : AbstractReactiveMongoConfiguration() {
-    override fun getDatabaseName(): String {
-        return "password-keeper"
-    }
-
-
-    override fun autoIndexCreation(): Boolean {
-        return true
-    }
-}
+class MongoConfig

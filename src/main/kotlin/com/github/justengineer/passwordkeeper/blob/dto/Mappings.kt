@@ -4,11 +4,12 @@ import com.github.justengineer.passwordkeeper.blob.BlobEntity
 import java.util.*
 
 fun CreateBlobRequest.toEntity(): BlobEntity {
-    return BlobEntity(
+    return BlobEntity(id = null,
             recordId = recordId,
             cypheredPayload = cypheredPayload,
             recordVersion = recordVersion,
-            userId = UUID.randomUUID().toString()
+            userId = UUID.randomUUID().toString(),
+            createdDate = null
     )
 }
 
