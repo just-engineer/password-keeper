@@ -89,10 +89,18 @@ class BlobRepositoryTest(@Autowired val repository: BlobRepository) {
         runBlocking {
             val savedBlobs = repository.saveAll(blobs).toList()
             println("savedBlobs = $savedBlobs")
-            val allSaved = repository.findAll().toList()
-            println("allSaved = $allSaved")
+
             val found = repository.findLatestRecordsByUserId(userId).toList()
             assertThat(found).hasSize(size)
+                    .allSatisfy { entity ->
+                        assertThat(entity.id).isNotNull()
+                        assertThat(entity.createdDate).isNotNull()
+                        assertThat(entity)
+                                .returns(4, { it.recordVersion })
+                                .returns(userId, { it.userId });
+                    }
+            assertThat(found.map { it.recordId })
+                    .doesNotHaveDuplicates()
             println("records = $found")
         }
     }
